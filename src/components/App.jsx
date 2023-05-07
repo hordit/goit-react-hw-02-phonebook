@@ -4,6 +4,7 @@ import { Layout } from "./Layout";
 import contacts from "./Data/Contacts.json"
 import { ContactList } from "./ContactList/ContactList";
 import { Filter } from "./Filter/Filter";
+import { GlobalStyle } from "./GlobalStyles";
 
 
 const INITIAL_STATE = {
@@ -15,14 +16,28 @@ export class App extends Component {
 
   componentDidMount() {
     this.setState({ contacts });
-  }
+  };
+
+  capitalizedName(str) {
+   return (typeof str !== 'string') 
+   ? '' 
+   : str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+  };
 
   addContact = newContact => {
-    this.setState(prevState => {
-      return {
-        contacts: [...prevState.contacts, newContact],
-      }
-    });
+    const isNameExsist = this.state.contacts.find(
+      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
+    );
+
+    const normalizedName = { ...newContact, name: this.capitalizedName(newContact.name),
+    };
+
+    (isNameExsist) ? alert(`${this.capitalizedName(newContact.name)} is already in contacts.`) : this.setState(prevState => ({
+      contacts: [...prevState.contacts, normalizedName],
+    }));
   };
 
   deleteContact = contactId => {
@@ -49,10 +64,11 @@ export class App extends Component {
 
     return (
       <Layout >
+        <GlobalStyle />
         <h1>Phonebook</h1>
         <ContactForm onAdd={this.addContact} />
-        <Filter value={filter} onChange={this.changeFilter} />
         <h2>Contacts</h2>
+        <Filter value={filter} onChange={this.changeFilter} />
         <ContactList contacts={visibleContacts} onDelete={this.deleteContact} />
       </Layout>
     )

@@ -1,13 +1,21 @@
-import { Contact } from "components/Contact/Contact"
+import { Contact } from "components/Contact/Contact";
+import PropTypes from 'prop-types';
+import { Li, Ul } from "./ContactList.slyled";
 
 export const ContactList = ({contacts, onDelete}) => {
     return (
-        <ul>
+        <Ul>
             {contacts.map(contact => (
-                <li key={contact.id}>
+                <Li key={contact.id}>
                     <Contact contact={contact} onDelete={onDelete}/>
-                </li>
+                </Li>
             ))}
-        </ul>
+        </Ul>
     );
+};
+
+ContactList.propTypes = {
+    contacts: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    }).isRequired).isRequired
 };
