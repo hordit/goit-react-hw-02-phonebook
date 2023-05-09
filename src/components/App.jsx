@@ -1,41 +1,35 @@
-import { Component } from "react";
-import { ContactForm } from "./ContactForm/ContactForm";
-import { Layout } from "./Layout";
-import contacts from "./Data/Contacts.json"
-import { ContactList } from "./ContactList/ContactList";
-import { Filter } from "./Filter/Filter";
-import { GlobalStyle } from "./GlobalStyles";
-
+import initialValues from './Data/Contacts.json';
+import { capitalizedName } from './Utils/capitalizedName';
+import { Component } from 'react';
+import { ContactForm } from './ContactForm/ContactForm';
+import { Layout } from './Layout';
+import { ContactList } from './ContactList/ContactList';
+import { Filter } from './Filter/Filter';
+import { GlobalStyle } from './GlobalStyles';
 
 const INITIAL_STATE = {
-  contacts: [],
+  contacts: initialValues,
   filter: '',
-}
+};
 export class App extends Component {
   state = { ...INITIAL_STATE };
-
-  componentDidMount() {
-    this.setState({ contacts });
-  };
-
-  capitalizedName(str) {
-   return (typeof str !== 'string') 
-   ? '' 
-   : str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-  };
 
   addContact = newContact => {
     const isNameExsist = this.state.contacts.find(
       contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
     );
 
-    const normalizedName = { ...newContact, name: this.capitalizedName(newContact.name),
+    const normalizedName = {
+      ...newContact,
+      name: capitalizedName(newContact.name),
     };
 
-    (isNameExsist) ? alert(`${this.capitalizedName(newContact.name)} is already in contacts.`) : this.setState(prevState => ({
+    if (isNameExsist) {
+      alert(`${capitalizedName(newContact.name)} is already in contacts.`);
+      return;
+    }
+
+    this.setState(prevState => ({
       contacts: [...prevState.contacts, normalizedName],
     }));
   };
@@ -43,19 +37,25 @@ export class App extends Component {
   deleteContact = contactId => {
     this.setState(prevState => {
       return {
-        contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-      }
+        contacts: prevState.contacts.filter(
+          contact => contact.id !== contactId
+        ),
+      };
     });
   };
 
-  changeFilter = (e) => {
+  changeFilter = e => {
     this.setState({ filter: e.currentTarget.value });
   };
 
   getVisibleContacts = ({ contacts, filter }) => {
     const normalizedFilter = filter.toLowerCase();
 
-    return contacts.filter(({name, number}) => name.toLowerCase().includes(normalizedFilter) || number.toLowerCase().includes(normalizedFilter));
+    return contacts.filter(
+      ({ name, number }) =>
+        name.toLowerCase().includes(normalizedFilter) ||
+        number.toLowerCase().includes(normalizedFilter)
+    );
   };
 
   render() {
@@ -63,7 +63,7 @@ export class App extends Component {
     const visibleContacts = this.getVisibleContacts(this.state);
 
     return (
-      <Layout >
+      <Layout>
         <GlobalStyle />
         <h1>Phonebook</h1>
         <ContactForm onAdd={this.addContact} />
@@ -71,8 +71,6 @@ export class App extends Component {
         <Filter value={filter} onChange={this.changeFilter} />
         <ContactList contacts={visibleContacts} onDelete={this.deleteContact} />
       </Layout>
-    )
-  };
-};
-
-
+    );
+  }
+}
